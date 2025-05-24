@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İnteraktif Muhasebe Problemleri ve Çözümleri</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .sidebar-item.active {
+            background-color: #fb923c;
+            color: white;
+        }
+
+        .yevmiye-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .yevmiye-table th,
+        .yevmiye-table td {
+            border: 1px solid #e5e7eb;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .yevmiye-table th {
+            background-color: #f3f4f6;
+        }
+
+        .hesap-borc {
+            padding-left: 20px;
+        }
+
+        .hesap-alacak {
+            padding-left: 40px;
+        }
+
+        .alt-hesap {
+            padding-left: 15px;
+            font-style: italic;
+            color: #4b5563;
+        }
+
+        .aciklama {
+            font-style: italic;
+            color: #6b7280;
+            padding-top: 5px;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 280px;
+            max-height: 300px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 300px;
+                max-height: 350px;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-amber-50 text-slate-800">
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <aside class="w-full md:w-1/4 bg-stone-100 p-6 shadow-lg">
+            <h2 class="text-2xl font-bold text-sky-700 mb-6 border-b-2 border-sky-500 pb-2">Muhasebe İşlemleri</h2>
+            <nav id="problemNav" class="space-y-2">
+            </nav>
+        </aside>
+
+        <main class="w-full md:w-3/4 p-8 overflow-auto">
+            <header class="mb-8">
+                <h1 class="text-4xl font-bold text-sky-700 text-center">Aralık 2025 Muhasebe Problemleri İnteraktif
+                    Çözümleri</h1>
+                <p class="text-center text-slate-600 mt-2">Bu uygulama, Aralık 2025 dönemine ait muhasebe problemlerini
+                    ve çözümlerini interaktif bir şekilde incelemenizi sağlar. Soldaki menüden bir problem seçerek
+                    başlayabilirsiniz.</p>
+            </header>
+            <section id="problemContent" class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-2xl font-semibold text-teal-700 mb-4" id="problemTitle">Problem Başlığı</h3>
+                <p class="text-slate-700 mb-4" id="problemDescription">Problem açıklaması burada yer alacak.</p>
+                <div id="problemSolution">
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const problems = [
+            {
+                id: 1,
+                title: "1) İşletmenin Kuruluşu",
+                description: "…………………….. ticaret işletmesi 01.12.2025 tarihinde 2 ortak tarafından kurulmuştur. Kuruluşta ortaklardan Cahit Yılmaz 250.000 TL, Sinan Bilmen 200.000 TL nakit sermaye koymuşlardır.",
+                solution: {
+                    date: "01.12.2025",
+                    entries: [
+                        { account: "100 KASA HS.", debit: "450.000", credit: "", subAccounts: [{ name: "100.01 Cahit Yılmaz Sermayesi", amount: "250.000" }, { name: "100.02 Sinan Bilmen Sermayesi", amount: "200.000" }] },
+                        { account: "500 SERMAYE HS.", debit: "", credit: "450.000", subAccounts: [{ name: "500.01 Cahit Yılmaz", amount: "250.000" }, { name: "500.02 Sinan Bilmen", amount: "200.000" }] }
+                    ],
+                    explanation: "İşletmenin kuruluş kaydı. Kasa mevcudu artarken (borçlu), ortakların sermayesi de artmıştır (alacaklı)."
+                },
+                interactive: {
+                    type: 'chart',
+                    chartType: 'pie',
+                    data: {
+                        labels: ['Cahit Yılmaz', 'Sinan Bilmen'],
+                        datasets: [{
+                            label: 'Sermaye Dağılımı',
+                            data: [250000, 200000],
+                            backgroundColor: ['rgba(54, 162, 235, 0.7)', 'rgba(75, 192, 192, 0.7)'],
+                            borderColor: ['rgba(54, 162, 235, 1)', 'rgba(75, 192, 192, 1)'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'top' }, title: { display: true, text: 'Ortakların Sermaye Katkıları (TL)' } }
+                    }
+                }
+            },
+            {
+                id: 2,
+                title: "2) Döviz Alımı",
+                description: "02.12.2025 tarihinde 1 Dolar = 35 TL kur üzerinden 2.000 Dolar alınmıştır.",
+                solution: {
+                    date: "02.12.2025",
+                    entries: [
+                        { account: "100 KASA HS.", debit: "70.000", credit: "", subAccounts: [{ name: "100.03 Yabancı Para Kasası (2.000 USD)" }] },
+                        { account: "100 KASA HS.", debit: "", credit: "70.000", subAccounts: [{ name: "100.00 Türk Lirası Kasası" }] }
+                    ],
+                    explanation: "1 Dolar = 35 TL kurdan 2.000 Dolar alımı. Yabancı Para Kasası (USD) artarken (borçlu), Türk Lirası Kasası azalmıştır (alacaklı)."
+                }
+            },
+            {
+                id: 3,
+                title: "3) Banka Hesabı Açılması",
+                description: "05.12.2025 tarihinde ABC bankasında hesap açılarak 40.000 TL yatırılmıştır.",
+                solution: {
+                    date: "05.12.2025",
+                    entries: [
+                        { account: "102 BANKALAR HS.", debit: "40.000", credit: "", subAccounts: [{ name: "102.01 ABC Bankası" }] },
+                        { account: "100 KASA HS.", debit: "", credit: "40.000", subAccounts: [{ name: "100.00 Türk Lirası Kasası" }] }
+                    ],
+                    explanation: "ABC Bankası'na hesap açılarak para yatırılması. Banka hesabı artarken (borçlu), Kasa azalmıştır (alacaklı)."
+                }
+            },
+            {
+                id: 4,
+                title: "4) Ticari Mal Alışı",
+                description: "05.12.2025 tarihinde aşağıdaki ticari mallar 23234 nolu fatura ile Kaçmaz ticaretten %20 KDV hariç 20.000 TL tutarında ticari mal satın alınmıştır. 7.000 TL ABC bankasındaki hesaptan havale yapılmış, kalan tutar için açık hesap (kredili) işlem yapılmıştır.",
+                calculation: "Mal Bedeli: 20.000 TL<br>KDV (%20): 20.000 * 0,20 = 4.000 TL<br>Toplam Borç: 24.000 TL<br>Bankadan Ödenen: 7.000 TL<br>Kredili Kalan (Satıcılara Borç): 24.000 - 7.000 = 17.000 TL",
+                solution: {
+                    date: "05.12.2025",
+                    entries: [
+                        { account: "153 TİCARİ MALLAR HS.", debit: "20.000", credit: "" },
+                        { account: "191 İNDİRİLECEK KDV HS.", debit: "4.000", credit: "" },
+                        { account: "102 BANKALAR HS.", debit: "", credit: "7.000", subAccounts: [{ name: "102.01 ABC Bankası" }] },
+                        { account: "320 SATICILAR HS.", debit: "", credit: "17.000", subAccounts: [{ name: "320.01 Kaçmaz Ticaret" }] }
+                    ],
+                    explanation: "Fatura No:23234, Kaçmaz Ticaret'ten mal alışı. Ticari Mallar ve İndirilecek KDV artarken (borçlu), Bankalar azalmış (alacaklı) ve Satıcılara borç artmıştır (alacaklı)."
+                }
+            },
+            {
+                id: 5,
+                title: "5) Alış İadesi",
+                description: "06.12.2025 tarihinde daha önce Kaçmaz ticaretten satın alınan ticari mallardan %20 KDV hariç 2000 TL tutarında mal iade edilmiştir. Bedeli açık hesaptan düşülmüştür. (47374 nolu iade faturası ile)",
+                calculation: "İade Mal Bedeli: 2.000 TL<br>İade KDV (%20): 2.000 * 0,20 = 400 TL<br>Toplam İade (Açık Hesaptan Düşülecek): 2.400 TL",
+                solution: {
+                    date: "06.12.2025",
+                    entries: [
+                        { account: "320 SATICILAR HS.", debit: "2.400", credit: "", subAccounts: [{ name: "320.01 Kaçmaz Ticaret" }] },
+                        { account: "153 TİCARİ MALLAR HS.", debit: "", credit: "2.000" },
+                        { account: "191 İNDİRİLECEK KDV HS.", debit: "", credit: "400" }
+                    ],
+                    explanation: "Fatura No:47374, Kaçmaz Ticaret'e mal iadesi. Satıcılara olan borç azalırken (borçlu), Ticari Mallar ve İndirilecek KDV azalmıştır (alacaklı)."
+                }
+            },
+            {
+                id: 6,
+                title: "6) Ticari Mal Satışı",
+                description: "10.12.2025 tarihinde Aker Ticarete %20 KDV hariç 23.000 TL tutarında satış yapılmıştır. 5.000 TL banka havalesi yoluyla tahsil edilmiş, kalan tutar açık hesap işlem yapılmıştır. (98423 nolu satış fatura ile)",
+                calculation: "Satış Bedeli: 23.000 TL<br>KDV (%20): 23.000 * 0,20 = 4.600 TL<br>Toplam Alacak: 27.600 TL<br>Bankaya Gelen: 5.000 TL<br>Kredili Kalan (Alıcılardan Alacak): 27.600 - 5.000 = 22.600 TL",
+                solution: {
+                    date: "10.12.2025",
+                    entries: [
+                        { account: "102 BANKALAR HS.", debit: "5.000", credit: "", subAccounts: [{ name: "102.01 ABC Bankası" }] },
+                        { account: "120 ALICILAR HS.", debit: "22.600", credit: "", subAccounts: [{ name: "120.01 Aker Ticaret" }] },
+                        { account: "600 YURTİÇİ SATIŞLAR HS.", debit: "", credit: "23.000" },
+                        { account: "391 HESAPLANAN KDV HS.", debit: "", credit: "4.600" }
+                    ],
+                    explanation: "Fatura No:98423, Aker Ticaret'e mal satışı. Bankalar ve Alıcılar artarken (borçlu), Yurtiçi Satışlar ve Hesaplanan KDV artmıştır (alacaklı)."
+                }
+            },
+            {
+                id: 7,
+                title: "7) Satış İadesi",
+                description: "11.12.2025 tarihinde daha önce satılan (10.12.2025 tarihinde) %20 KDV hariç 3000 TL tutarındaki ticari mallar işletmemize iade edilmiş, bedeli açık hesaptan düşülmüştür. (86467 nolu iade faturası ile)",
+                calculation: "İade Alınan Mal Bedeli: 3.000 TL<br>İade KDV (%20): 3.000 * 0,20 = 600 TL<br>Toplam İade (Açık Hesaptan Düşülecek): 3.600 TL",
+                solution: {
+                    date: "11.12.2025",
+                    entries: [
+                        { account: "610 SATIŞTAN İADELER HS.", debit: "3.000", credit: "" },
+                        { account: "391 HESAPLANAN KDV HS.", debit: "600", credit: "" },
+                        { account: "120 ALICILAR HS.", debit: "", credit: "3.600", subAccounts: [{ name: "120.01 Aker Ticaret" }] }
+                    ],
+                    explanation: "Fatura No:86467, Aker Ticaret'ten mal iadesi. Satıştan İadeler ve Hesaplanan KDV (azalış) artarken (borçlu), Alıcılardan alacak azalmıştır (alacaklı)."
+                }
+            },
+            {
+                id: 8,
+                title: "8) Döviz Bozdurma",
+                description: "17.12.2025 tarihinde 1 Dolar = 38 TL kur üzerinden 1000 dolar bozdurulmuştur.",
+                calculation: "Bozdurulan Dolar: 1.000 USD<br>Alış Kuru: 35 TL/USD<br>Bozdurma Kuru: 38 TL/USD<br>Dövizin Maliyeti: 1.000 * 35 = 35.000 TL<br>Ele Geçen TL: 1.000 * 38 = 38.000 TL<br>Kambiyo Kârı: 38.000 - 35.000 = 3.000 TL",
+                solution: {
+                    date: "17.12.2025",
+                    entries: [
+                        { account: "100 KASA HS.", debit: "38.000", credit: "", subAccounts: [{ name: "100.00 Türk Lirası Kasası" }] },
+                        { account: "100 KASA HS.", debit: "", credit: "35.000", subAccounts: [{ name: "100.03 Yabancı Para Kasası (1.000 USD)" }] },
+                        { account: "646 KAMBİYO KÂRLARI HS.", debit: "", credit: "3.000" }
+                    ],
+                    explanation: "1.000 Doların 1 USD=38 TL'den bozdurulması. Türk Lirası Kasası artarken (borçlu), Yabancı Para Kasası maliyet değeriyle azalmış (alacaklı) ve kur farkından dolayı Kambiyo Kârı oluşmuştur (alacaklı)."
+                }
+            },
+            {
+                id: 9,
+                title: "9) Demirbaş Alımı",
+                description: "20.12.2025 tarihinde işletmede kullanmak amacıyla %20 kdv hariç 10.000 TL ye genel yönetim amaçlı kullanmak üzere demirbaş satın alınmış, bedeli peşin ödenmiştir.",
+                calculation: "Demirbaş Bedeli: 10.000 TL<br>KDV (%20): 10.000 * 0,20 = 2.000 TL<br>Toplam Ödenen: 12.000 TL",
+                solution: {
+                    date: "20.12.2025",
+                    entries: [
+                        { account: "255 DEMİRBAŞLAR HS.", debit: "10.000", credit: "" },
+                        { account: "191 İNDİRİLECEK KDV HS.", debit: "2.000", credit: "" },
+                        { account: "100 KASA HS.", debit: "", credit: "12.000", subAccounts: [{ name: "100.00 Türk Lirası Kasası" }] }
+                    ],
+                    explanation: "Genel yönetim amaçlı demirbaş alımı. Demirbaşlar ve İndirilecek KDV artarken (borçlu), Kasa azalmıştır (alacaklı)."
+                }
+            },
+            {
+                id: 10,
+                title: "10) Kira Ödemesi",
+                description: "31.12.2025 tarihinde yönetim ofisi olarak kullanılan binanın kirası olan %20 Stopaj dahil 20.000 TL banka havalesi yoluyla ödenmiştir.",
+                calculation: "Ödenen Net Kira (Stopaj Dahil): 20.000 TL<br>Stopaj Oranı: %20<br>Brüt Kira = Net Kira / (1 - Stopaj Oranı) = 20.000 / 0,80 = 25.000 TL<br>Stopaj Tutarı = Brüt Kira * Stopaj Oranı = 25.000 * 0,20 = 5.000 TL",
+                solution: {
+                    date: "31.12.2025",
+                    entries: [
+                        { account: "770 GENEL YÖNETİM GİDERLERİ HS.", debit: "25.000", credit: "", subAccounts: [{ name: "770.01 Kira Giderleri" }] },
+                        { account: "102 BANKALAR HS.", debit: "", credit: "20.000", subAccounts: [{ name: "102.01 ABC Bankası" }] },
+                        { account: "360 ÖDENECEK VERGİ VE FONLAR HS.", debit: "", credit: "5.000", subAccounts: [{ name: "360.01 Ödenecek Gelir Vergisi Stopajı" }] }
+                    ],
+                    explanation: "Yönetim ofisi kira ödemesi. Kira Gideri (Brüt) artarken (borçlu), Banka azalmış (alacaklı) ve Ödenecek Vergi (Stopaj) artmıştır (alacaklı)."
+                }
+            },
+            {
+                id: 11,
+                title: "11) Açık Hesap Borçların Ödenmesi",
+                description: "31.12.2025 Açık hesap borçların hepsi banka havalesi yoluyla ödenmiştir.",
+                calculation: "Kaçmaz Ticaret'e Borç (İşlem 4): 17.000 TL<br>İade Sonrası Kalan Borç (İşlem 5): 17.000 - 2.400 = 14.600 TL",
+                solution: {
+                    date: "31.12.2025",
+                    entries: [
+                        { account: "320 SATICILAR HS.", debit: "14.600", credit: "", subAccounts: [{ name: "320.01 Kaçmaz Ticaret" }] },
+                        { account: "102 BANKALAR HS.", debit: "", credit: "14.600", subAccounts: [{ name: "102.01 ABC Bankası" }] }
+                    ],
+                    explanation: "Kaçmaz Ticaret'e olan açık hesap borcun ödenmesi. Satıcılara borç azalırken (borçlu), Banka azalmıştır (alacaklı)."
+                }
+            },
+            {
+                id: 12,
+                title: "12) Açık Hesap Alacakların Tahsili",
+                description: "31.12.2025 Açık hesap alacakların hepsi banka havalesi yoluyla tahsil edilmiştir.",
+                calculation: "Aker Ticaret'ten Alacak (İşlem 6): 22.600 TL<br>İade Sonrası Kalan Alacak (İşlem 7): 22.600 - 3.600 = 19.000 TL",
+                solution: {
+                    date: "31.12.2025",
+                    entries: [
+                        { account: "102 BANKALAR HS.", debit: "19.000", credit: "", subAccounts: [{ name: "102.01 ABC Bankası" }] },
+                        { account: "120 ALICILAR HS.", debit: "", credit: "19.000", subAccounts: [{ name: "120.01 Aker Ticaret" }] }
+                    ],
+                    explanation: "Aker Ticaret'ten olan açık hesap alacağın tahsili. Banka artarken (borçlu), Alıcılardan alacak azalmıştır (alacaklı)."
+                }
+            },
+            {
+                id: 13,
+                title: "13) KDV Mahsup İşlemi",
+                description: "31.12.2025 tarihi itibariyle kdv mahsup işlemini yapınız.",
+                calculationTitle: "KDV Hesaplamaları:",
+                calculation: "<b>191 İndirilecek KDV:</b><br>" +
+                    "  İşlem 4 (Mal Alışı): +4.000 TL<br>" +
+                    "  İşlem 5 (Alış İadesi): -400 TL<br>" +
+                    "  İşlem 9 (Demirbaş Alışı): +2.000 TL<br>" +
+                    "  <i>Toplam İndirilecek KDV: 5.600 TL (Borç)</i><br><br>" +
+                    "<b>391 Hesaplanan KDV:</b><br>" +
+                    "  İşlem 6 (Mal Satışı): +4.600 TL<br>" +
+                    "  İşlem 7 (Satış İadesi): -600 TL<br>" +
+                    "  <i>Toplam Hesaplanan KDV: 4.000 TL (Alacak)</i><br><br>" +
+                    "<b>Mahsup Sonucu:</b><br>" +
+                    "  İndirilecek KDV (5.600) > Hesaplanan KDV (4.000) => Devreden KDV = 1.600 TL",
+                solution: {
+                    date: "31.12.2025",
+                    entries: [
+                        { account: "391 HESAPLANAN KDV HS.", debit: "4.000", credit: "" },
+                        { account: "190 DEVREDEN KDV HS.", debit: "1.600", credit: "" },
+                        { account: "191 İNDİRİLECEK KDV HS.", debit: "", credit: "5.600" }
+                    ],
+                    explanation: "Aralık ayı KDV mahsup kaydı. Hesaplanan KDV borçlandırılarak, İndirilecek KDV alacaklandırılarak kapatılır. Fark Devreden KDV olarak kaydedilir."
+                },
+                interactive: {
+                    type: 'chart',
+                    chartType: 'bar',
+                    data: {
+                        labels: ['KDV Türü'],
+                        datasets: [
+                            { label: 'İndirilecek KDV', data: [5600], backgroundColor: 'rgba(54, 162, 235, 0.7)', borderColor: 'rgba(54, 162, 235, 1)', borderWidth: 1 },
+                            { label: 'Hesaplanan KDV', data: [4000], backgroundColor: 'rgba(255, 99, 132, 0.7)', borderColor: 'rgba(255, 99, 132, 1)', borderWidth: 1 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { y: { beginAtZero: true, title: { display: true, text: 'Tutar (TL)' } } },
+                        plugins: { legend: { position: 'top' }, title: { display: true, text: 'KDV Mahsup Karşılaştırması' } }
+                    }
+                }
+            },
+            {
+                id: 14,
+                title: "14) Amortisman Kaydı",
+                description: "31.12 itibariyle demirbaş için normal amortisman yöntemine göre ayrılacak amortisman tutarını hesaplayarak (ekonomik ömrü 5 yıldır) gerekli muhasebe kaydını yapınız.",
+                calculationTitle: "Amortisman Hesaplaması:",
+                calculation: "Demirbaş Maliyeti: 10.000 TL<br>" +
+                    "Ekonomik Ömür: 5 yıl<br>" +
+                    "Yıllık Amortisman: 10.000 / 5 = 2.000 TL<br>" +
+                    "Alış Tarihi: 20.12.2025<br>" +
+                    "2025 Yılı İçin Kıst Amortisman (Aralık - 1 ay): 2.000 / 12 = 166,67 TL",
+                solution: {
+                    date: "31.12.2025",
+                    entries: [
+                        { account: "770 GENEL YÖNETİM GİDERLERİ HS.", debit: "166,67", credit: "", subAccounts: [{ name: "770.02 Amortisman Giderleri" }] },
+                        { account: "257 BİRİKMİŞ AMORTİSMANLAR HS. (-)", debit: "", credit: "166,67", subAccounts: [{ name: "257.01 Demirbaşlar Amortismanı" }] }
+                    ],
+                    explanation: "Demirbaş için Aralık ayı amortisman kaydı. Amortisman Gideri artarken (borçlu), Birikmiş Amortismanlar artmıştır (alacaklı)."
+                }
+            },
+            {
+                id: 15,
+                title: "15) Satılan Malların Maliyeti (STMM)",
+                description: "31.12 itibariyle sayım yapılmış ve depoda 4000 TL tutarında Ticari mal olduğu tespit edilmiştir. Satılan malların maliyet kaydını yapınız.",
+                calculationTitle: "STMM Hesaplaması:",
+                calculation: "Dönem Başı Stok: 0 TL<br>" +
+                    "Dönem İçi Alışlar (Net):<br>" +
+                    "  Alışlar (İşlem 4): 20.000 TL<br>" +
+                    "  Alış İadesi (İşlem 5): (2.000 TL)<br>" +
+                    "  Net Alışlar: 18.000 TL<br>" +
+                    "Satılabilir Ticari Mal Maliyeti: 0 + 18.000 = 18.000 TL<br>" +
+                    "Dönem Sonu Stok: 4.000 TL<br>" +
+                    "STMM = 18.000 - 4.000 = 14.000 TL",
+                solution: {
+                    date: "31.12.2025",
+                    entries: [
+                        { account: "621 SATILAN TİCARİ MALLAR MALİYETİ HS.", debit: "14.000", credit: "" },
+                        { account: "153 TİCARİ MALLAR HS.", debit: "", credit: "14.000" }
+                    ],
+                    explanation: "Satılan ticari malların maliyet kaydı. STMM artarken (borçlu), Ticari Mallar azalmıştır (alacaklı)."
+                }
+            }
+        ];
+
+        const problemNav = document.getElementById('problemNav');
+        const problemTitle = document.getElementById('problemTitle');
+        const problemDescription = document.getElementById('problemDescription');
+        const problemSolutionDiv = document.getElementById('problemSolution');
+        let currentChart = null;
+
+        function formatYevmiyeEntry(entry) {
+            let subAccountHtml = '';
+            if (entry.subAccounts) {
+                subAccountHtml = entry.subAccounts.map(sub => `<div class="alt-hesap">${sub.name} ${sub.amount ? `(${sub.amount})` : ''}</div>`).join('');
+            }
+            const accountClass = entry.debit ? 'hesap-borc' : 'hesap-alacak';
+            return `
+                <tr>
+                    <td class="${accountClass}">${entry.account}${subAccountHtml}</td>
+                    <td class="text-right">${entry.debit || ''}</td>
+                    <td class="text-right">${entry.credit || ''}</td>
+                </tr>
+            `;
+        }
+
+        function displayProblem(problemId) {
+            const problem = problems.find(p => p.id === problemId);
+            if (!problem) return;
+
+            problemTitle.textContent = problem.title;
+            problemDescription.textContent = problem.description;
+
+            let solutionHtml = '';
+
+            if (problem.calculationTitle) {
+                solutionHtml += `<h4 class="text-xl font-semibold text-teal-600 mt-4 mb-2">${problem.calculationTitle}</h4>`;
+            }
+            if (problem.calculation) {
+                solutionHtml += `<div class="bg-amber-100 p-3 rounded-md text-sm text-slate-700 mb-4">${problem.calculation}</div>`;
+            }
+
+            solutionHtml += `<h4 class="text-xl font-semibold text-teal-600 mt-4 mb-2">Yevmiye Kaydı:</h4>`;
+            solutionHtml += `<div class="overflow-x-auto"><table class="yevmiye-table">
+                                <thead>
+                                    <tr><th>Hesap Adı</th><th>Borç (TL)</th><th>Alacak (TL)</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="3" class="text-center font-semibold bg-stone-50">--- ${problem.solution.date} ---</td></tr>
+                                    ${problem.solution.entries.map(formatYevmiyeEntry).join('')}
+                                    <tr><td colspan="3" class="aciklama text-center">${problem.solution.explanation}</td></tr>
+                                    <tr><td colspan="3" class="text-center font-semibold bg-stone-50">--------------------</td></tr>
+                                </tbody>
+                             </table></div>`;
+
+            if (problem.interactive && problem.interactive.type === 'chart') {
+                solutionHtml += `<h4 class="text-xl font-semibold text-teal-600 mt-6 mb-2">Görselleştirme:</h4>`;
+                solutionHtml += `<div class="chart-container bg-stone-50 p-4 rounded-md shadow"><canvas id="interactiveChart"></canvas></div>`;
+            } else {
+                if (currentChart) {
+                    currentChart.destroy();
+                    currentChart = null;
+                }
+            }
+
+            problemSolutionDiv.innerHTML = solutionHtml;
+
+            if (problem.interactive && problem.interactive.type === 'chart') {
+                const ctx = document.getElementById('interactiveChart').getContext('2d');
+                if (currentChart) {
+                    currentChart.destroy();
+                }
+                currentChart = new Chart(ctx, {
+                    type: problem.interactive.chartType,
+                    data: problem.interactive.data,
+                    options: problem.interactive.options
+                });
+            }
+
+            document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+            document.querySelector(`.sidebar-item[data-id='${problemId}']`).classList.add('active');
+        }
+
+        problems.forEach(problem => {
+            const navItem = document.createElement('button');
+            navItem.classList.add('block', 'w-full', 'text-left', 'p-3', 'rounded-md', 'hover:bg-amber-200', 'transition-colors', 'sidebar-item', 'text-sky-800', 'hover:text-orange-700');
+            navItem.textContent = problem.title;
+            navItem.dataset.id = problem.id;
+            navItem.onclick = () => displayProblem(problem.id);
+            problemNav.appendChild(navItem);
+        });
+
+        if (problems.length > 0) {
+            displayProblem(problems[0].id);
+        } else {
+            problemTitle.textContent = "Hoş Geldiniz!";
+            problemDescription.textContent = "İncelemek için lütfen soldaki menüden bir problem seçin.";
+            problemSolutionDiv.innerHTML = "";
+        }
+    </script>
+</body>
+
+</html>
